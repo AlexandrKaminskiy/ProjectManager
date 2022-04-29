@@ -3,12 +3,25 @@ package com.company.ProjectManager.model;
 import javax.persistence.*;
 
 @Entity
+@Table
 public class TaskInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     private String task;
-//    private ProjectInfo project;
+
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private ProjectInfo project;
+
+    public ProjectInfo getProject() {
+        return project;
+    }
+
+    public void setProject(ProjectInfo project) {
+        this.project = project;
+    }
 
     public TaskInfo() {
     }

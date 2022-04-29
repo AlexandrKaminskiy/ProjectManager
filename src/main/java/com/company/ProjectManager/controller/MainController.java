@@ -40,10 +40,4 @@ public class MainController {
         return projects.save(projectInfo);
     }
 
-//    @PutMapping("{id}")
-//    public ProjectInfo update(@PathVariable String id) {
-//        return projects.save(projectInfo);
-//    }
-
-
 }

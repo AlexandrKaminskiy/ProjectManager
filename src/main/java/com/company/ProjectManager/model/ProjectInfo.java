@@ -1,7 +1,11 @@
 package com.company.ProjectManager.model;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import javax.persistence.*;
 @Entity
+@Table
 public class ProjectInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
