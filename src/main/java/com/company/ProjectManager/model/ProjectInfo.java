@@ -1,9 +1,8 @@
 package com.company.ProjectManager.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-
 import javax.persistence.*;
+import java.util.List;
+
 @Entity
 @Table
 public class ProjectInfo {
@@ -11,6 +10,10 @@ public class ProjectInfo {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
+
+    @ManyToMany
+    @JoinColumn(referencedColumnName = "user_id")
+    private List<User> author;
 
     public ProjectInfo() {
     }
