@@ -25,7 +25,12 @@ public class ProjectServise {
     public void addUser(ProjectInfo projectInfo) {
 //        projectInfo.
     }
+
     public List<ProjectInfo> findAllProjects() {
         return projects.findAll();
+    }
+
+    public void deleteProject(Long id) {
+        projects.deleteById(id);
     }
 }

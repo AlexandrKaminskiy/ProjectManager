@@ -14,12 +14,14 @@
         <tr>
             <td>[[${project.id}]]</td>
             <td>[[${project.name}]]</td>
+            <td><a th:href="@{'/projects/' + ${project.id}}">Edit</a></td>
+            <td><a th:href="@{'/projects/delete/' + ${project.id}}">Delete</a></td>
         </tr>
     </th:block>
 
 </table>
 
-<form th:action="@{/createprojectform}" method="get">
+<form th:action="@{projects/createprojectform}" method="get">
     <input type="submit" value="create new project"/>
 </form>
 
