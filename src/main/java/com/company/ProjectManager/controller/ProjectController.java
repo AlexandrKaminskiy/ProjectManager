@@ -21,8 +21,9 @@ public class ProjectController {
     TaskService taskService;
 
     @GetMapping()
-    public String list(Model model) {
-        model.addAttribute("projectList",projectServise.findAllProjects());
+    public String list(Model model,
+                       @AuthenticationPrincipal User user) {
+        model.addAttribute("projectList",projectServise.findProjects(user));
         return "projects";
     }
 
@@ -54,7 +55,7 @@ public class ProjectController {
     public String addTask(@PathVariable Long id,
                           @RequestParam String task) {
         taskService.addNewTask(id, task);
-        System.out.println(id);
+//        System.out.println(id);
         return "redirect:/projects";
     }
 

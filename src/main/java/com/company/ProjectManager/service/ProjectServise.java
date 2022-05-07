@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProjectServise {
@@ -22,12 +23,8 @@ public class ProjectServise {
         projects.save(projectInfo);
     }
 
-    public void addUser(ProjectInfo projectInfo) {
-//        projectInfo.
-    }
-
-    public List<ProjectInfo> findAllProjects() {
-        return projects.findAll();
+    public List<ProjectInfo> findProjects(User user) {
+        return projects.findByAuthor(user);
     }
 
     public void deleteProject(Long id) {
