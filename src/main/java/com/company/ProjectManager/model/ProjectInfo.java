@@ -15,7 +15,7 @@ public class ProjectInfo {
     private String name;
 
     @ManyToMany
-    @JoinColumn(referencedColumnName = "user_id")
+    @JoinColumn(referencedColumnName = "author_id")
     private List<User> author;
 
     public ProjectInfo() {

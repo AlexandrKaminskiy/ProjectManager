@@ -26,6 +26,7 @@ public class User implements UserDetails {
     private Set<Role> roles;
 
     @ManyToMany
+    @JoinColumn(referencedColumnName = "project_info_id")
     private List<ProjectInfo> project;
 
 

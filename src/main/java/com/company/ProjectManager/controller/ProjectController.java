@@ -1,8 +1,10 @@
 package com.company.ProjectManager.controller;
 
+import com.company.ProjectManager.model.ProjectInfo;
 import com.company.ProjectManager.model.User;
 import com.company.ProjectManager.service.ProjectServise;
 import com.company.ProjectManager.service.TaskService;
+import com.company.ProjectManager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +22,9 @@ public class ProjectController {
 
     @Autowired
     TaskService taskService;
+
+    @Autowired
+    UserService userService;
 
     @GetMapping()
     public String list(Model model,
@@ -61,8 +66,10 @@ public class ProjectController {
     }
 
     @GetMapping("projectinfo/{id}")
-    public String projectInfoForm() {
-        return "projectinfo";
+    public String projectInfoForm(@PathVariable Long id, Model model) {
+        model.addAttribute("taskList",taskService.findProjectTasks(id));
+        model.addAttribute("userList",projectServise.findProjectUsers(id));
+        return "project_info";
     }
 
 

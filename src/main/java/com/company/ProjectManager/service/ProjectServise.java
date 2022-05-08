@@ -1,6 +1,7 @@
 package com.company.ProjectManager.service;
 
 import com.company.ProjectManager.model.ProjectInfo;
+import com.company.ProjectManager.model.TaskInfo;
 import com.company.ProjectManager.model.User;
 import com.company.ProjectManager.repos.ProjectInfoRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,4 +31,10 @@ public class ProjectServise {
     public void deleteProject(Long id) {
         projects.deleteById(id);
     }
+
+    public List<User> findProjectUsers(Long projectInfo) {
+
+        return projects.getById(projectInfo).getAuthor();
+    }
+
 }

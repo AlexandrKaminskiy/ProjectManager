@@ -1,5 +1,6 @@
 package com.company.ProjectManager.service;
 
+import com.company.ProjectManager.model.ProjectInfo;
 import com.company.ProjectManager.model.TaskInfo;
 import com.company.ProjectManager.repos.ProjectInfoRepo;
 import com.company.ProjectManager.repos.TaskRepo;
@@ -24,5 +25,9 @@ public class TaskService {
     public void deleteProjectTasks(Long projectId) {
         var o = taskRepo.findTaskInfoByProjectId(projectId);
         taskRepo.deleteAll(o);
+    }
+
+    public Iterable<TaskInfo> findProjectTasks(Long projectId) {
+        return taskRepo.findTaskInfoByProjectId(projectId);
     }
 }
