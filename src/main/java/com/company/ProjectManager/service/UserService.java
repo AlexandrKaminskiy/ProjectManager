@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -27,7 +26,9 @@ public class UserService implements UserDetailsService {
     }
 
     public void changeUserInfo(String role, User user) {
-        user.setRoles(Collections.singleton(Role.valueOf(role)));
+        user.getRoles().clear();
+        user.getRoles().add(Role.valueOf(role));
+
         userRepo.save(user);
     }
 }

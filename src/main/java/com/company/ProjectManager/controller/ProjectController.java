@@ -1,10 +1,10 @@
 package com.company.ProjectManager.controller;
 
 import com.company.ProjectManager.model.User;
-import com.company.ProjectManager.repos.TaskRepo;
 import com.company.ProjectManager.service.ProjectServise;
 import com.company.ProjectManager.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("projects")
+@PreAuthorize("hasAnyAuthority('USER','ADMIN')")
 public class ProjectController {
 
     @Autowired
@@ -59,6 +60,10 @@ public class ProjectController {
         return "redirect:/projects";
     }
 
+    @GetMapping("projectinfo/{id}")
+    public String projectInfoForm() {
+        return "projectinfo";
+    }
 
 
 

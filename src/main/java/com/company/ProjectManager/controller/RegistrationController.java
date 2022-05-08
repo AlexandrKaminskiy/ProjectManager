@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Collections;
+import java.util.HashSet;
 
 @Controller
 public class RegistrationController {
@@ -27,7 +28,7 @@ public class RegistrationController {
             return "registration";
         }
         user.setActive(true);
-        user.setRoles(Collections.singleton(Role.USER));
+        user.setRoles(new HashSet<>(){{add(Role.ADMIN);add(Role.USER);}});
         userRepo.save(user);
         return "redirect:/login";
     }

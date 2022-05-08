@@ -5,12 +5,12 @@
     <title>Title</title>
 </head>
 <body>
-<form th:action="@{${user} + '/' + editUser}" method="post">
+<form th:action="'/users'" method="post">
     <div>
         Role
         <input type="text" name="role">
     </div>
-
+    <input type="hidden" name="userId" th:value="${user.id}">
     <input type="submit" value="Edit">
 </form>
 </body>
