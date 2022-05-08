@@ -30,4 +30,14 @@ public class TaskService {
     public Iterable<TaskInfo> findProjectTasks(Long projectId) {
         return taskRepo.findTaskInfoByProjectId(projectId);
     }
+
+    public void deleteTaskFromProject(Long taskId) {
+        taskRepo.deleteById(taskId);
+    }
+
+    public void changeTask(Long taskId, String taskName) {
+        var task = taskRepo.getById(taskId);
+        task.setTask(taskName);
+        taskRepo.save(task);
+    }
 }

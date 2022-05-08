@@ -61,18 +61,57 @@ public class ProjectController {
     public String addTask(@PathVariable Long id,
                           @RequestParam String task) {
         taskService.addNewTask(id, task);
-//        System.out.println(id);
         return "redirect:/projects";
     }
 
     @GetMapping("projectinfo/{id}")
     public String projectInfoForm(@PathVariable Long id, Model model) {
+        model.addAttribute("projectName",projectServise.getProjectName(id));
         model.addAttribute("taskList",taskService.findProjectTasks(id));
         model.addAttribute("userList",projectServise.findProjectUsers(id));
         return "project_info";
     }
 
+    @PostMapping("projectinfo/addusr/{id}")
+    public String addUser(@PathVariable Long id,
+                          @RequestParam String newUser) {
+        projectServise.addUserToProject(id,newUser);
+
+        return "redirect:/projects/projectinfo/{id}";
+    }
+
+    @GetMapping("projectinfo/deleteusr/{id}/{userId}")
+    public String deleteUser(@PathVariable Long id,
+                             @PathVariable Long userId) {
+        projectServise.deleteUserFromProject(id,userId);
+        return "redirect:/projects/projectinfo/{id}";
+    }
+
+    @GetMapping("projectinfo/deletetask/{taskId}")
+    public String deleteTask(@PathVariable Long taskId) {
+        System.out.println(taskId);
+        taskService.deleteTaskFromProject(taskId);
+        return "redirect:/projects";
+    }
+
+    @GetMapping("projectinfo/changetask/{taskId}")
+    public String changeTaskForm(@PathVariable Long taskId) {
+        return "changetask";
+    }
+
+    @PostMapping("projectinfo/changetask/{taskId}")
+    public String changeTask(@PathVariable Long taskId,
+                             @RequestParam String taskName) {
+        taskService.changeTask(taskId,taskName);
+        return "redirect:/projects";
+    }
 
 
 
+    @PostMapping("projectinfo/changeName/{id}")
+    public String changeName(@PathVariable Long id,
+                             @RequestParam String newName) {
+        projectServise.changeProjectName(id,newName);
+        return "redirect:/projects/projectinfo/{id}";
+    }
 }

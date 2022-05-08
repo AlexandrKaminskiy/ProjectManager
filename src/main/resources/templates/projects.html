@@ -16,6 +16,8 @@
             <td>[[${project.name}]]</td>
             <td><a th:href="@{'/projects/' + ${project.id}}" th:method="post">Edit</a></td>
             <td><a th:href="@{'/projects/delete/' + ${project.id}}" >Delete</a></td>
+            <td><a th:href="@{'/projects/projectinfo/' + ${project.id}}" >Info</a></td>
+
         </tr>
     </th:block>
 

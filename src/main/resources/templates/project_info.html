@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:custom="http://www.w3.org/1999/xhtml">
 
 <head>
     <title>TI</title>
@@ -9,30 +9,46 @@
 </head>
 
 <body>
-
-<div style="display: inline">
-    <div style="display: inline-block">
-        <table border="1px">
-            <th:block th:each="user: ${userList}">
-                <tr>
-                    <td>[[${user.id}]]</td>
-                    <td>[[${user.username}]]</td>
-                </tr>
-            </th:block>
-        </table>
+    <div>
+        <span th:text="${projectName}"></span>
     </div>
+    <div style="display: inline">
+        <div style="display: inline-block">
+            <table border="1px">
+                <th:block th:each="user: ${userList}">
+                    <tr>
+                        <td>[[${user.id}]]</td>
+                        <td>[[${user.username}]]</td>
+                        <td><a th:href="@{'deleteusr/' + ${id} + '/' + ${user.id}}">Delete</a> </td>
+                    </tr>
+                </th:block>
+            </table>
+        </div>
 
-    <div style="display: inline-block">
-        <table border="1px">
-            <th:block th:each="task: ${taskList}">
-                <tr>
-                    <td>[[${task.task}]]</td>
-                </tr>
-            </th:block>
-        </table>
+        <div style="display: inline-block">
+            <table border="1px">
+                <th:block th:each="task: ${taskList}">
+                    <tr>
+                        <td>[[${task.task}]]</td>
+                        <td><a th:href="@{'deletetask/' + ${task.id}}">Delete</a> </td>
+                        <td><a th:href="@{'changetask/' + ${task.id}}">Change</a> </td>
+                    </tr>
+                </th:block>
+            </table>
+        </div>
     </div>
-</div>
-
+    <div>
+        <form th:action="@{addusr + '/' + ${id}}" method="post">
+            <input type="text" th:name="newUser">
+            <input type="submit" value="Add user">
+        </form>
+    </div>
+    <div>
+        <form th:action="@{changeName + '/' + ${id}}" method="post">
+            <input type="text" th:name="newName">
+            <input type="submit" value="Change name">
+        </form>
+    </div>
 </body>
 
 </html>
