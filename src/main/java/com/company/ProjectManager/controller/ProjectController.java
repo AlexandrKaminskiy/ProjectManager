@@ -1,117 +1,137 @@
 package com.company.ProjectManager.controller;
 
+import com.company.ProjectManager.Dto.ProjectInfoDto;
+import com.company.ProjectManager.Dto.TaskInfoDto;
+import com.company.ProjectManager.desirealizer.JsonSerializer;
 import com.company.ProjectManager.model.ProjectInfo;
 import com.company.ProjectManager.model.User;
 import com.company.ProjectManager.service.ProjectServise;
 import com.company.ProjectManager.service.TaskService;
 import com.company.ProjectManager.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("projects")
-@PreAuthorize("hasAnyAuthority('USER','ADMIN')")
-public class ProjectController {
+import java.util.List;
 
+@RestController
+@RequestMapping("projects")
+public class ProjectController {
     @Autowired
     ProjectServise projectServise;
-
     @Autowired
     TaskService taskService;
-
     @Autowired
     UserService userService;
 
     @GetMapping()
-    public String list(Model model,
-                       @AuthenticationPrincipal User user) {
-        model.addAttribute("projectList",projectServise.findProjects(user));
-        return "projects";
-    }
-
-    @GetMapping("/createprojectform")
-    public String createProjectForm() {
-        return "createprojectform";
-    }
-
-    @PostMapping("createproject")
-    public String createProject(@RequestParam String projectName,
-                                @AuthenticationPrincipal User user) {
-        projectServise.createProject(projectName,user);
-        return "redirect:/projects";
-    }
-
-    @GetMapping("delete/{id}")
-    public String deleteProject(@PathVariable Long id) {
-        taskService.deleteProjectTasks(id);
-        projectServise.deleteProject(id);
-        return "redirect:/projects";
+    public List<ProjectInfoDto> projectList(@AuthenticationPrincipal User user) {
+        return projectServise.findProjects(user);
     }
 
     @GetMapping("{id}")
-    public String addTaskForm(@PathVariable Long id) {
-        return "addtask";
+    public ProjectInfoDto project(@PathVariable Long id,
+                                  @AuthenticationPrincipal User user) {
+        return projectServise.projectInfo(id);
     }
 
-    @PostMapping("{id}/addtask")
-    public String addTask(@PathVariable Long id,
-                          @RequestParam String task) {
-        taskService.addNewTask(id, task);
+    @PostMapping("createproject")
+    public String createProject(@RequestBody ProjectInfoDto projectInfoDto,
+                                @AuthenticationPrincipal User user) {
+        projectServise.createProject(projectInfoDto,user);
         return "redirect:/projects";
     }
 
-    @GetMapping("projectinfo/{id}")
-    public String projectInfoForm(@PathVariable Long id, Model model) {
-        model.addAttribute("projectName",projectServise.getProjectName(id));
-        model.addAttribute("taskList",taskService.findProjectTasks(id));
-        model.addAttribute("userList",projectServise.findProjectUsers(id));
-        return "project_info";
+    @DeleteMapping("{id}")
+    public void deleteProject(@PathVariable Long id,
+                              @AuthenticationPrincipal User user) {
+        projectServise.deleteProject(id,user);
     }
 
-    @PostMapping("projectinfo/addusr/{id}")
-    public String addUser(@PathVariable Long id,
-                          @RequestParam String newUser) {
-        projectServise.addUserToProject(id,newUser);
-
-        return "redirect:/projects/projectinfo/{id}";
+    @GetMapping("{id}/tasks")
+    public String getTasks(@PathVariable Long id) {
+        TaskInfoDto a = new TaskInfoDto(1l,"2");
+        String result = "";
+        try {
+            result = new ObjectMapper().writeValueAsString(a);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return result;//taskService.findProjectTasks(id);
     }
 
-    @GetMapping("projectinfo/deleteusr/{id}/{userId}")
-    public String deleteUser(@PathVariable Long id,
-                             @PathVariable Long userId) {
-        projectServise.deleteUserFromProject(id,userId);
-        return "redirect:/projects/projectinfo/{id}";
-    }
-
-    @GetMapping("projectinfo/deletetask/{taskId}")
-    public String deleteTask(@PathVariable Long taskId) {
-        System.out.println(taskId);
-        taskService.deleteTaskFromProject(taskId);
+    @PutMapping("{id}")
+    public String updateProject(@PathVariable Long id,
+                                @RequestBody ProjectInfoDto projectInfoDto,
+                                @AuthenticationPrincipal User user) {
+        projectServise.updateProject(id, projectInfoDto, user);
         return "redirect:/projects";
     }
 
-    @GetMapping("projectinfo/changetask/{taskId}")
-    public String changeTaskForm(@PathVariable Long taskId) {
-        return "changetask";
+    @GetMapping("/q")
+    public String q(@RequestBody TaskInfoDto projectInfo) {
+
+//        String json = projectInfo.getBody();
+        JsonSerializer creator = new JsonSerializer();
+        return "cool";
     }
 
-    @PostMapping("projectinfo/changetask/{taskId}")
-    public String changeTask(@PathVariable Long taskId,
-                             @RequestParam String taskName) {
-        taskService.changeTask(taskId,taskName);
-        return "redirect:/projects";
-    }
+//    @PostMapping("{id}/addtask")
+//    public String addTask(@PathVariable Long id,
+//                          @RequestParam String task) {
+//        taskService.addNewTask(id, task);
+//        return "redirect:/projects";
+//    }
 
+//    @GetMapping("projectinfo/{id}")
+//    public String projectInfoForm(@PathVariable Long id, Model model) {
+//        model.addAttribute("projectName",projectServise.getProjectName(id));
+//        model.addAttribute("taskList",taskService.findProjectTasks(id));
+//        model.addAttribute("userList",projectServise.findProjectUsers(id));
+//        return "project_info";
+//    }
 
+//    @PostMapping("projectinfo/addusr/{id}")
+//    public String addUser(@PathVariable Long id,
+//                          @RequestParam String newUser) {
+//        projectServise.addUserToProject(id,newUser);
+//
+//        return "redirect:/projects/projectinfo/{id}";
+//    }
 
-    @PostMapping("projectinfo/changeName/{id}")
-    public String changeName(@PathVariable Long id,
-                             @RequestParam String newName) {
-        projectServise.changeProjectName(id,newName);
-        return "redirect:/projects/projectinfo/{id}";
-    }
+//    @GetMapping("projectinfo/deleteusr/{id}/{userId}")
+//    public String deleteUser(@PathVariable Long id,
+//                             @PathVariable Long userId) {
+//        projectServise.deleteUserFromProject(id,userId);
+//        return "redirect:/projects/projectinfo/{id}";
+//    }
+
+//    @GetMapping("projectinfo/deletetask/{taskId}")
+//    public String deleteTask(@PathVariable Long taskId) {
+//        System.out.println(taskId);
+//        taskService.deleteTaskFromProject(taskId);
+//        return "redirect:/projects";
+//    }
+
+//    @GetMapping("projectinfo/changetask/{taskId}")
+//    public String changeTaskForm(@PathVariable Long taskId) {
+//        return "changetask";
+//    }
+
+//    @PostMapping("projectinfo/changetask/{taskId}")
+//    public String changeTask(@PathVariable Long taskId,
+//                             @RequestParam String taskName) {
+//        taskService.changeTask(taskId,taskName);
+//        return "redirect:/projects";
+//    }
+
+//    @PostMapping("projectinfo/changeName/{id}")
+//    public String changeName(@PathVariable Long id,
+//                             @RequestParam String newName) {
+//        projectServise.changeProjectName(id,newName);
+//        return "redirect:/projects/projectinfo/{id}";
+//    }
 }

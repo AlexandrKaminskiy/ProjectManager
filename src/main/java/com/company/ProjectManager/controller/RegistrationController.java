@@ -1,39 +1,20 @@
 package com.company.ProjectManager.controller;
 
-import com.company.ProjectManager.model.Role;
-import com.company.ProjectManager.model.User;
-import com.company.ProjectManager.repos.UserRepo;
+import com.company.ProjectManager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
-import java.util.HashSet;
-
-@Controller
+@RestController
 public class RegistrationController {
-    @Autowired
-    private UserRepo userRepo;
 
-    @GetMapping("registration")
-    public String registration() {
-        return "registration";
-    }
+    @Autowired
+    private UserService userService;
 
     @PostMapping("registration")
-    public String addUser(User user) {
-        User userFromDb = userRepo.findByUsername(user.getUsername());
-        if(userFromDb != null) {
-            return "registration";
-        }
-        user.setActive(true);
-        user.setRoles(new HashSet<>(){{add(Role.ADMIN);add(Role.USER);}});
-        userRepo.save(user);
-        return "redirect:/login";
+    public String addUser(@RequestParam String username,
+                          @RequestParam String password) {
+        return userService.registrateUser(username, password);
     }
-
-
-
-
 }

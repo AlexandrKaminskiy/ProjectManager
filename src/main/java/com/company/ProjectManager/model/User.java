@@ -29,11 +29,6 @@ public class User implements UserDetails {
     @JoinColumn(referencedColumnName = "project_info_id")
     private List<ProjectInfo> project;
 
-
-    public String getUsername() {
-        return username;
-    }
-
     @Override
     public boolean isAccountNonExpired() {
         return true;

@@ -1,7 +1,6 @@
 package com.company.ProjectManager.repos;
 
 import com.company.ProjectManager.model.ProjectInfo;
-import com.company.ProjectManager.model.TaskInfo;
 import com.company.ProjectManager.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
