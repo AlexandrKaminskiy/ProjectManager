@@ -17,10 +17,10 @@ import java.util.List;
 @Service
 public class TaskService {
     @Autowired
-    TaskRepo taskRepo;
+    private TaskRepo taskRepo;
 
     @Autowired
-    ProjectInfoRepo projectInfoRepo;
+    private ProjectInfoRepo projectInfoRepo;
 
     public TaskInfoDto addNewTask(Long projectId, TaskInfoDto taskInfoDto) {
         checkTaskRequest(taskInfoDto);
@@ -47,6 +47,7 @@ public class TaskService {
     }
 
     public void deleteTaskFromProject(Long taskId) {
+        if (!taskRepo.existsById(taskId)) throw new TaskNotFoundException();
         taskRepo.deleteById(taskId);
     }
 
