@@ -25,17 +25,4 @@ public class JsonSerializer<T> {
         return result;
     }
 
-//    public String toJsonArray(T[] objects) {
-//        StringBuilder result = new StringBuilder("[");
-//        for (var object: objects) {
-//            try {
-//                result = result.append(new ObjectMapper().writeValueAsString(object));
-//
-//            } catch (JsonProcessingException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        result.append("]");
-//        return result;
-//    }
 }

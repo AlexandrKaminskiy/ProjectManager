@@ -13,7 +13,7 @@ public class ProjectInfo {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
-
+    private Boolean isDeleted;
     @ManyToMany
     @JoinColumn(referencedColumnName = "author_id")
     private List<User> author;

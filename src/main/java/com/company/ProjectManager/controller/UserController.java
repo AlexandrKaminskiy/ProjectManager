@@ -1,36 +1,36 @@
 package com.company.ProjectManager.controller;
 
-import com.company.ProjectManager.model.User;
+import com.company.ProjectManager.Dto.UserDto;
 import com.company.ProjectManager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.List;
+
+@RestController
 @RequestMapping("users")
 public class UserController {
     @Autowired
     UserService userService;
 
     @GetMapping()
-    public String adminPanel(Model model) {
-        model.addAttribute("userList",userService.findAllUsers());
-        return "adminpanel";
+    public List<UserDto> adminPanel() {
+        return userService.findAllUsers();
     }
 
-    @GetMapping("{user}")
-    public String editUserPanel(@PathVariable User user) {
-
-        return "edituserpanel";
+    @GetMapping("{username}")
+    public UserDto userInfo(@PathVariable String username) {
+        return userService.findUser(username);
     }
 
     @PostMapping()
-    public String editUser(@RequestParam("userId") User user,
-                           @RequestParam String role) {
-        userService.changeUserInfo(role,user);
-        return "redirect:/users";
+    public UserDto registateUser(@RequestBody UserDto userDto) {
+        return userService.registrateUser(userDto);
     }
 
-
+    @PutMapping("{username}")
+    public UserDto updateProject(@PathVariable String username,
+                                 @RequestBody UserDto userDto) {
+        return userService.updateUser(username, userDto);
+    }
 }

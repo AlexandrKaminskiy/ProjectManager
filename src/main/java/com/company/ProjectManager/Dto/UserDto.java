@@ -1,23 +1,20 @@
 package com.company.ProjectManager.Dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.company.ProjectManager.model.Role;
 import lombok.Data;
+
+import java.util.Set;
 
 @Data
 public class UserDto {
-    private Long id;
+
     private String username;
     private String password;
+    private Set<Role> roles;
 
-    public UserDto(Long id, String username, String password) {
-        this.id = id;
+    public UserDto(String username, Set<Role> roles) {
         this.username = username;
-        this.password = password;
-    }
-
-    public UserDto(Long id, String username) {
-        this.id = id;
-        this.username = username;
+        this.roles = roles;
     }
 
     public UserDto(){

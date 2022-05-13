@@ -17,6 +17,8 @@ public class TaskInfo {
 
     private String task;
 
+    private Boolean isDeleted;
+
     @ManyToOne
     @JoinColumn(name = "project_id")
     private ProjectInfo project;

@@ -1,6 +1,9 @@
 package com.company.ProjectManager.service;
 
 import com.company.ProjectManager.Dto.ProjectInfoDto;
+import com.company.ProjectManager.Dto.UserDto;
+import com.company.ProjectManager.exceptions.InvalidHttpBodyException;
+import com.company.ProjectManager.exceptions.ProjectNotFoundException;
 import com.company.ProjectManager.model.ProjectInfo;
 import com.company.ProjectManager.model.Role;
 import com.company.ProjectManager.model.User;
@@ -23,24 +26,37 @@ public class ProjectServise {
     @Autowired
     TaskService taskService;
 
-    public void createProject(ProjectInfoDto projectInfoDto, User user) {
+
+    public ProjectInfoDto createProject(ProjectInfoDto projectInfoDto, User user) {
+        if (projectInfoDto.getName() == null) {
+            throw new InvalidHttpBodyException();
+        }
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.setName(projectInfoDto.getName());
+        projectInfo.setIsDeleted(false);
         ArrayList<User> users = new ArrayList<>();
-        var authors = projectInfoDto.getAuthor();
+        List<UserDto> authors = projectInfoDto.getAuthor();
+        if (authors == null) authors = new ArrayList<>();
+        authors.add(new UserDto(user.getUsername(),user.getRoles()));
+        authors = authors.stream().distinct().toList();
         for (var author : authors) {
-            users.add(userRepo.getById(author.getId()));
+            users.add(userRepo.findByUsername(author.getUsername()));
         }
         projectInfo.setAuthor(users);
         projects.save(projectInfo);
+        projectInfoDto.setId(projectInfo.getId());
+        return projectInfoDto;
     }
 
     public List<ProjectInfoDto> findProjects(User user) {
         Stream<ProjectInfo> result;
         var projectInfoDto = new ArrayList<ProjectInfoDto>();
         if (user.getRoles().contains(Role.ADMIN)) {
-            result = projects.findAll().stream();
-        } else result = projects.findByAuthor(user).stream();
+            result = projects.findByIsDeleted(false).stream();
+        } else result = projects.findByAuthorAndIsDeleted(user,false).stream();
+        if (result == null) {
+            throw new ProjectNotFoundException();
+        }
         result.forEach((p) -> projectInfoDto.add(new ProjectInfoDto(p.getId(),p.getName(),p.getAuthor(),taskService.findProjectTasks(p.getId()))));
         return projectInfoDto;
     }
@@ -48,72 +64,60 @@ public class ProjectServise {
     public void deleteProject(Long id, User user) {
         if(isBelongToUser(user, id)) {
             taskService.deleteProjectTasks(id);
-            projects.deleteById(id);
-        }
-    }
-
-    public List<User> findProjectUsers(Long projectInfo) {
-
-        return projects.getById(projectInfo).getAuthor();
-    }
-
-    public void addUserToProject(Long id, String newUser) {
-        var project =  projects.getById(id);
-        var authors = project.getAuthor();
-        authors.add(userRepo.findByUsername(newUser));
-        project.setAuthor(authors);
-        projects.save(project);
-    }
-
-    public String getProjectName(Long id) {
-        return projects.getById(id).getName();
-    }
-
-    public void changeProjectName(Long id, String newName) {
-        if (newName != null) {
-            var project = projects.getById(id);
-            project.setName(newName);
-            projects.save(project);
-        }
-    }
-
-    public void deleteUserFromProject(Long id, Long userId) {
-        var project = projects.getById(id);
-        if (project.getAuthor().size() > 1) {
-            project.getAuthor().remove(userRepo.getById(userId));
-            projects.save(project);
-        }
-    }
-
-    public ProjectInfoDto projectInfo(Long id) {
-        var p = projects.getById(id);
-        return new ProjectInfoDto(p.getId(),p.getName(),p.getAuthor(),taskService.findProjectTasks(p.getId()));
-    }
-    ///ЗДЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕСЬЪЪЪЪ
-    public void updateProject(Long id, ProjectInfoDto projectInfoDto, User user) {
-        if (isBelongToUser(user, id)) {
-            ProjectInfo dbProject = projects.getById(id);
-
-            ProjectInfo projectInfo = new ProjectInfo();
-            projectInfo.setName(projectInfoDto.getName());
-            ArrayList<User> users = new ArrayList<>();
-            var authors = projectInfoDto.getAuthor();
-            for (var author : authors) {
-                users.add(userRepo.getById(author.getId()));
-            }
-            projectInfo.setAuthor(users);
-
-//            taskService.
-
-            BeanUtils.copyProperties(dbProject,projectInfo,"id");
+            ProjectInfo dbProject = projects.findByIdAndIsDeleted(id, false);
+            dbProject.setIsDeleted(true);
             projects.save(dbProject);
         }
     }
 
+    public ProjectInfoDto projectInfo(User user,Long id) {
+        if (isBelongToUser(user,id)) {
+            var p = projects.findByIdAndIsDeleted(id, false);
+            if (p == null) {
+                throw new ProjectNotFoundException();
+            }
+            return new ProjectInfoDto(p.getId(),p.getName(),p.getAuthor(),taskService.findProjectTasks(p.getId()));
+        }
+        return null;
+    }
+
+    public ProjectInfoDto updateProject(Long id, ProjectInfoDto projectInfoDto, User user) {
+        if (isBelongToUser(user, id)) {
+            ProjectInfo dbProject = projects.findByIdAndIsDeleted(id, false);
+            ProjectInfo projectInfo = new ProjectInfo();
+            if (projectInfoDto.getName() == null) throw new InvalidHttpBodyException();
+            projectInfo.setName(projectInfoDto.getName());
+            ArrayList<User> users = new ArrayList<>();
+            var authors = projectInfoDto.getAuthor();
+            if (authors == null) throw new InvalidHttpBodyException();
+                else authors = authors.stream().distinct().toList();
+            for (var author : authors) {
+                users.add(userRepo.findByUsername(author.getUsername()));
+            }
+            projectInfo.setAuthor(users);
+            taskService.deleteProjectTasks(id);
+            var tasks = projectInfoDto.getTasks();
+            if (tasks != null) {
+                for (var task : tasks) {
+                    taskService.addNewTask(id, task);
+                }
+            }
+            BeanUtils.copyProperties(projectInfo,dbProject,"id","isDeleted");
+            projects.save(dbProject);
+            return projectInfoDto;
+        }
+        return null;
+    }
+
     private boolean isBelongToUser(User user, Long id) {
-        if(projects.getById(id).getAuthor().contains(user) || user.getRoles().contains(Role.ADMIN)) {
+        var project = projects.findByIdAndIsDeleted(id, false);
+        if (project == null) {
+            throw new ProjectNotFoundException();
+        }
+        if(project.getAuthor().contains(user) || user.getRoles().contains(Role.ADMIN)) {
             return true;
         }
         return false;
     }
+
 }
