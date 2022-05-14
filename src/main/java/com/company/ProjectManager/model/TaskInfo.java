@@ -1,30 +1,34 @@
 package com.company.ProjectManager.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Table
-@Data
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
 public class TaskInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+
     private Long id;
 
     private String task;
 
+    @JsonIgnore
     private Boolean isDeleted;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "project_id")
     private ProjectInfo project;
-
-    public TaskInfo() {
-    }
 
     public TaskInfo(Long id, String task, ProjectInfo project) {
         this.id = id;

@@ -1,19 +1,27 @@
 package com.company.ProjectManager.controller;
 
 import com.company.ProjectManager.Dto.UserDto;
+import com.company.ProjectManager.model.User;
 import com.company.ProjectManager.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 @RestController
-@RequestMapping("registration")
+@RequestMapping("/registration")
 public class RegistrationController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public RegistrationController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping()
-    public UserDto registateUser(@RequestBody UserDto userDto) {
+    public User registateUser(@RequestBody @Valid UserDto userDto) {
         return userService.registrateUser(userDto);
     }
 }

@@ -4,28 +4,26 @@ import com.company.ProjectManager.Dto.UserDto;
 import com.company.ProjectManager.exceptions.UserNotFoundException;
 import com.company.ProjectManager.model.Role;
 import com.company.ProjectManager.model.User;
-import com.company.ProjectManager.repos.ProjectInfoRepo;
 import com.company.ProjectManager.repos.UserRepo;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
-    @Autowired
-    private UserRepo userRepo;
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    private final UserRepo userRepo;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepo userRepo, PasswordEncoder passwordEncoder) {
+        this.userRepo = userRepo;
+        this.passwordEncoder = passwordEncoder;
+    }
 
 
     @Override
@@ -33,22 +31,19 @@ public class UserService implements UserDetailsService {
         return userRepo.findByUsername(username);
     }
 
-    public List<UserDto> findAllUsers() {
-        ArrayList<UserDto> userDtos = new ArrayList<>();
+    public List<User> findAllUsers() {
         var users = userRepo.findAll();
         if (users == null) throw new UserNotFoundException();
-        users.stream().forEach((p) -> userDtos.add(new UserDto(p.getUsername(),p.getRoles())));
-        return userDtos;
+        return users;
     }
 
-    public UserDto findUser(String username) {
+    public User findUser(String username) {
         var user = userRepo.findByUsername(username);
         if (user == null) throw new UserNotFoundException();
-        UserDto userDto = new UserDto(user.getUsername(),user.getRoles());
-        return userDto;
+        return user;
     }
 
-    public UserDto updateUser(String username, UserDto userDto) {
+    public User updateUser(String username, UserDto userDto) {
         User dbUser = userRepo.findByUsername(username);
         if (dbUser == null) throw new UserNotFoundException();
         User user = new User();
@@ -57,13 +52,12 @@ public class UserService implements UserDetailsService {
         newRoles.remove(Role.ADMIN);
         if (newRoles.isEmpty()) newRoles.add(Role.USER);
         user.setRoles(newRoles);
-        BeanUtils.copyProperties(dbUser,user,"id");
+        BeanUtils.copyProperties(user,dbUser,"active","id","password");
         userRepo.save(dbUser);
-        userDto.setPassword(null);
-        return userDto;
+        return dbUser;
     }
 
-    public UserDto registrateUser(UserDto userDto) {
+    public User registrateUser(UserDto userDto) {
         User userFromDb = userRepo.findByUsername(userDto.getUsername());
         if (userFromDb != null) {
             return null;
@@ -75,8 +69,8 @@ public class UserService implements UserDetailsService {
         user.setRoles(Collections.singleton(Role.USER));
 
         userRepo.save(user);
-        userDto.setPassword(null);
-        return userDto;
+
+        return user;
     }
 
 }
