@@ -9,5 +9,6 @@ import java.util.List;
 public interface TaskRepo extends JpaRepository<TaskInfo, Long> {
 
     List<TaskInfo> findTaskInfoByProjectIdAndIsDeleted(Long projectInfo, Boolean isDeleted, Pageable pageable);
+    List<TaskInfo> findTaskInfoByProjectIdAndIsDeletedAndTaskContains(Long projectInfo, Boolean isDeleted,String task, Pageable pageable);
     TaskInfo getByIdAndIsDeleted(Long id, Boolean isDeleted);
 }

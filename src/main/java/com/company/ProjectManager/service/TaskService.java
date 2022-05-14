@@ -1,10 +1,11 @@
 package com.company.ProjectManager.service;
 
+import com.company.ProjectManager.Dto.ProjectInfoDto;
 import com.company.ProjectManager.Dto.TaskInfoDto;
 import com.company.ProjectManager.exceptions.InvalidHttpBodyException;
-import com.company.ProjectManager.exceptions.ProjectNotFoundException;
 import com.company.ProjectManager.exceptions.TaskNotFoundException;
 import com.company.ProjectManager.model.TaskInfo;
+import com.company.ProjectManager.model.User;
 import com.company.ProjectManager.repos.ProjectInfoRepo;
 import com.company.ProjectManager.repos.TaskRepo;
 import org.springframework.beans.BeanUtils;
@@ -84,5 +85,13 @@ public class TaskService {
         if (taskInfoDto.getTask() == null ) {
             throw new InvalidHttpBodyException();
         }
+    }
+
+    public List<TaskInfoDto> findTasksByName(User user, Long id, String name, Pageable pageable) {
+        ArrayList<TaskInfoDto> taskInfoDtos = new ArrayList<>();
+        var tasks = taskRepo.findTaskInfoByProjectIdAndIsDeletedAndTaskContains(id,false, name, pageable);
+        if (tasks == null) throw new TaskNotFoundException();
+        tasks.forEach((p) -> taskInfoDtos.add(new TaskInfoDto(p.getId(),p.getTask())));
+        return taskInfoDtos;
     }
 }

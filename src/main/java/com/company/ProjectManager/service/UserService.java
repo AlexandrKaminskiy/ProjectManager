@@ -25,14 +25,8 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserRepo userRepo;
     @Autowired
-    private  ProjectInfoRepo projectInfoRepo;
-    @Autowired
     PasswordEncoder passwordEncoder;
 
-    @Bean
-    public PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -79,6 +73,7 @@ public class UserService implements UserDetailsService {
         user.setUsername(userDto.getUsername());
         user.setActive(true);
         user.setRoles(Collections.singleton(Role.USER));
+
         userRepo.save(user);
         userDto.setPassword(null);
         return userDto;

@@ -39,7 +39,9 @@ public class ProjectServise {
         List<UserDto> authors = projectInfoDto.getAuthor();
         if (authors == null) authors = new ArrayList<>();
         authors.add(new UserDto(user.getUsername(),user.getRoles()));
-        authors = authors.stream().distinct().toList();
+        authors = authors.stream()
+                .distinct()
+                .toList();
         for (var author : authors) {
             users.add(userRepo.findByUsername(author.getUsername()));
         }
@@ -51,15 +53,17 @@ public class ProjectServise {
 
     public List<ProjectInfoDto> findProjects(User user, Pageable pageable) {
         Stream<ProjectInfo> result;
-        var projectInfoDto = new ArrayList<ProjectInfoDto>();
+        var projectInfoDtos = new ArrayList<ProjectInfoDto>();
         if (user.getRoles().contains(Role.ADMIN)) {
             result = projects.findByIsDeleted(false, pageable).stream();
-        } else result = projects.findByAuthorAndIsDeleted(user,false, pageable).stream();
+        } else {
+            result = projects.findByAuthorAndIsDeleted(user,false, pageable).stream();
+        }
         if (result == null) {
             throw new ProjectNotFoundException();
         }
-        result.forEach((p) -> projectInfoDto.add(new ProjectInfoDto(p.getId(),p.getName(),p.getAuthor(),taskService.findProjectTasks(p.getId()),p.getCompanyName(),p.getIsReady())));
-        return projectInfoDto;
+        result.forEach((p) -> projectInfoDtos.add(new ProjectInfoDto(p.getId(),p.getName(),p.getAuthor(),taskService.findProjectTasks(p.getId()),p.getCompanyName(),p.getIsReady())));
+        return projectInfoDtos;
     }
 
     public void deleteProject(Long id, User user) {
@@ -124,8 +128,18 @@ public class ProjectServise {
         return false;
     }
 
+    public List<ProjectInfoDto> findProjectsByFilter(User user,String companyName, String name, Pageable pageable) {
+        List<ProjectInfo> result = new ArrayList<>();
+        if (!user.getRoles().contains(Role.ADMIN)) {
+            result = projects.findByIsDeletedAndCompanyNameContainsAndNameContainsAndAuthor(false,
+                            companyName, name, user, pageable);
+        } else {
+            result = projects.findByIsDeletedAndCompanyNameContainsAndNameContains(false,
+                    companyName, name, pageable);
+        }
+        var projectInfoDtos = new ArrayList<ProjectInfoDto>();
+        result.forEach((p) -> projectInfoDtos.add(new ProjectInfoDto(p.getId(),p.getName(),p.getAuthor(),taskService.findProjectTasks(p.getId()),p.getCompanyName(),p.getIsReady())));
+        return projectInfoDtos;
 
-    public List<ProjectInfoDto> findProjectsByFilter(User user, Pageable pageable) {
-        return null;
     }
 }

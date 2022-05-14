@@ -12,5 +12,13 @@ public interface ProjectInfoRepo extends JpaRepository<ProjectInfo, Long> {
     List<ProjectInfo> findByAuthorAndIsDeleted(User user, Boolean isDeleted, Pageable pageable);
     ProjectInfo findByIdAndIsDeleted(Long id, Boolean isDeleted);
     List<ProjectInfo> findByIsDeleted(Boolean isDeleted, Pageable pageable);
-
+    List<ProjectInfo> findByIsDeletedAndCompanyNameContainsAndNameContainsAndAuthor(Boolean isDeleted,
+                                                                                          String companyName,
+                                                                                          String name,
+                                                                                          User user,
+                                                                                          Pageable pageable);
+    List<ProjectInfo> findByIsDeletedAndCompanyNameContainsAndNameContains(Boolean isDeleted,
+                                                                                    String companyName,
+                                                                                    String name,
+                                                                                    Pageable pageable);
 }
