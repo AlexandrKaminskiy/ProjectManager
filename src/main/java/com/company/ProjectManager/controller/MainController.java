@@ -8,6 +8,6 @@ public class MainController {
 
     @GetMapping()
     public String init() {
-        return "Hi";
+        return "Welcome to the project manager!";
     }
 }

@@ -28,7 +28,7 @@ class TaskServiceTest {
     void addNewTask() {
         TaskInfoDto dto = new TaskInfoDto(1l,"111");
         var testDto = taskService.addNewTask(1l,dto);
-        assertEquals("111",testDto.getTaskName());
+        assertEquals("111",testDto.getTask());
     }
 
     @Test

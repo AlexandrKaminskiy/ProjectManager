@@ -2,13 +2,15 @@ package com.company.ProjectManager.repos;
 
 import com.company.ProjectManager.model.ProjectInfo;
 import com.company.ProjectManager.model.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
 public interface ProjectInfoRepo extends JpaRepository<ProjectInfo, Long> {
-    List<ProjectInfo> findByAuthorAndIsDeleted(User user, Boolean isDeleted);
+
+    List<ProjectInfo> findByAuthorAndIsDeleted(User user, Boolean isDeleted, Pageable pageable);
     ProjectInfo findByIdAndIsDeleted(Long id, Boolean isDeleted);
-    List<ProjectInfo> findByIsDeleted(Boolean isDeleted);
+    List<ProjectInfo> findByIsDeleted(Boolean isDeleted, Pageable pageable);
 
 }

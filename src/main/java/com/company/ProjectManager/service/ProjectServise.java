@@ -11,6 +11,7 @@ import com.company.ProjectManager.repos.ProjectInfoRepo;
 import com.company.ProjectManager.repos.UserRepo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -48,16 +49,16 @@ public class ProjectServise {
         return projectInfoDto;
     }
 
-    public List<ProjectInfoDto> findProjects(User user) {
+    public List<ProjectInfoDto> findProjects(User user, Pageable pageable) {
         Stream<ProjectInfo> result;
         var projectInfoDto = new ArrayList<ProjectInfoDto>();
         if (user.getRoles().contains(Role.ADMIN)) {
-            result = projects.findByIsDeleted(false).stream();
-        } else result = projects.findByAuthorAndIsDeleted(user,false).stream();
+            result = projects.findByIsDeleted(false, pageable).stream();
+        } else result = projects.findByAuthorAndIsDeleted(user,false, pageable).stream();
         if (result == null) {
             throw new ProjectNotFoundException();
         }
-        result.forEach((p) -> projectInfoDto.add(new ProjectInfoDto(p.getId(),p.getName(),p.getAuthor(),taskService.findProjectTasks(p.getId()))));
+        result.forEach((p) -> projectInfoDto.add(new ProjectInfoDto(p.getId(),p.getName(),p.getAuthor(),taskService.findProjectTasks(p.getId()),p.getCompanyName(),p.getIsReady())));
         return projectInfoDto;
     }
 
@@ -76,7 +77,7 @@ public class ProjectServise {
             if (p == null) {
                 throw new ProjectNotFoundException();
             }
-            return new ProjectInfoDto(p.getId(),p.getName(),p.getAuthor(),taskService.findProjectTasks(p.getId()));
+            return new ProjectInfoDto(p.getId(),p.getName(),p.getAuthor(),taskService.findProjectTasks(p.getId()),p.getCompanyName(),p.getIsReady());
         }
         return null;
     }
@@ -87,6 +88,8 @@ public class ProjectServise {
             ProjectInfo projectInfo = new ProjectInfo();
             if (projectInfoDto.getName() == null) throw new InvalidHttpBodyException();
             projectInfo.setName(projectInfoDto.getName());
+            projectInfo.setCompanyName(projectInfoDto.getCompanyName());
+            projectInfo.setIsReady(projectInfoDto.getIsReady());
             ArrayList<User> users = new ArrayList<>();
             var authors = projectInfoDto.getAuthor();
             if (authors == null) throw new InvalidHttpBodyException();
@@ -104,6 +107,7 @@ public class ProjectServise {
             }
             BeanUtils.copyProperties(projectInfo,dbProject,"id","isDeleted");
             projects.save(dbProject);
+
             return projectInfoDto;
         }
         return null;
@@ -120,4 +124,8 @@ public class ProjectServise {
         return false;
     }
 
+
+    public List<ProjectInfoDto> findProjectsByFilter(User user, Pageable pageable) {
+        return null;
+    }
 }

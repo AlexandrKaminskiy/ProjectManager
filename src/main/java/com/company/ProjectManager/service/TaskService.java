@@ -9,6 +9,7 @@ import com.company.ProjectManager.repos.ProjectInfoRepo;
 import com.company.ProjectManager.repos.TaskRepo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class TaskService {
     public TaskInfoDto addNewTask(Long projectId, TaskInfoDto taskInfoDto) {
         checkTaskRequest(taskInfoDto);
         TaskInfo taskInfo = new TaskInfo();
-        taskInfo.setTask(taskInfoDto.getTaskName());
+        taskInfo.setTask(taskInfoDto.getTask());
         taskInfo.setIsDeleted(false);
         taskInfo.setProject(projectInfoRepo.getById(projectId));
         taskRepo.save(taskInfo);
@@ -34,7 +35,7 @@ public class TaskService {
     }
 
     public void deleteProjectTasks(Long projectId) {
-        var tasks = taskRepo.findTaskInfoByProjectIdAndIsDeleted(projectId,false);
+        var tasks = taskRepo.findTaskInfoByProjectIdAndIsDeleted(projectId,false, Pageable.unpaged());
         if (tasks == null) throw new TaskNotFoundException();
         for (var task : tasks) {
             task.setIsDeleted(true);
@@ -43,7 +44,7 @@ public class TaskService {
     }
 
     public List<TaskInfo> findProjectTasks(Long projectId) {
-        return taskRepo.findTaskInfoByProjectIdAndIsDeleted(projectId,false);
+        return taskRepo.findTaskInfoByProjectIdAndIsDeleted(projectId,false, Pageable.unpaged());
     }
 
     public void deleteTaskFromProject(Long taskId) {
@@ -51,9 +52,9 @@ public class TaskService {
         taskRepo.deleteById(taskId);
     }
 
-    public List<TaskInfoDto> findProjectTasksDto(Long id) {
+    public List<TaskInfoDto> findProjectTasksDto(Long id,Pageable pageable) {
         ArrayList<TaskInfoDto> taskInfoDtos = new ArrayList<>();
-        var tasks = taskRepo.findTaskInfoByProjectIdAndIsDeleted(id,false);
+        var tasks = taskRepo.findTaskInfoByProjectIdAndIsDeleted(id,false, pageable);
         if (tasks == null) throw new TaskNotFoundException();
         tasks.forEach((p) -> taskInfoDtos.add(new TaskInfoDto(p.getId(),p.getTask())));
         return taskInfoDtos;
@@ -72,7 +73,7 @@ public class TaskService {
         TaskInfo dbTask = taskRepo.getByIdAndIsDeleted(taskId,false);
         if (dbTask == null) throw new TaskNotFoundException();
         TaskInfo taskInfo = new TaskInfo();
-        taskInfo.setTask(taskInfoDto.getTaskName());
+        taskInfo.setTask(taskInfoDto.getTask());
         taskInfo.setProject(projectInfoRepo.getById(projectId));
 
         BeanUtils.copyProperties(taskInfo,dbTask,"id","isDeleted");
@@ -80,7 +81,7 @@ public class TaskService {
         return taskInfoDto;
     }
     private void checkTaskRequest(TaskInfoDto taskInfoDto) {
-        if (taskInfoDto.getTaskName() == null ) {
+        if (taskInfoDto.getTask() == null ) {
             throw new InvalidHttpBodyException();
         }
     }

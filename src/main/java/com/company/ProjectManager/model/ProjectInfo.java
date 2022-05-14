@@ -14,6 +14,8 @@ public class ProjectInfo {
     private Long id;
     private String name;
     private Boolean isDeleted;
+    private String companyName;
+    private Boolean isReady;
     @ManyToMany
     @JoinColumn(referencedColumnName = "author_id")
     private List<User> author;

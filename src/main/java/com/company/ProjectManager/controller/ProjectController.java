@@ -6,11 +6,18 @@ import com.company.ProjectManager.model.User;
 import com.company.ProjectManager.service.ProjectServise;
 import com.company.ProjectManager.service.TaskService;
 import com.company.ProjectManager.service.UserService;
+import org.hibernate.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Condition;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.criteria.Predicate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("projects")
@@ -23,8 +30,9 @@ public class ProjectController {
     UserService userService;
 
     @GetMapping()
-    public List<ProjectInfoDto> projectList(@AuthenticationPrincipal User user) {
-        return projectServise.findProjects(user);
+    public List<ProjectInfoDto> projectList(@AuthenticationPrincipal User user,
+                                            Pageable pageable) {
+        return projectServise.findProjects(user,pageable);
     }
 
     @GetMapping("{id}")
@@ -32,6 +40,28 @@ public class ProjectController {
                                   @AuthenticationPrincipal User user) {
         return projectServise.projectInfo(user,id);
     }
+
+    @GetMapping("filter")
+    public List<ProjectInfoDto> projectFilter(@AuthenticationPrincipal User user,
+                                              Pageable pageable, Condition condition) {
+
+        return projectServise.findProjectsByFilter(user,pageable);
+    }
+
+//    @GetMapping("filter")
+//    public List<ProjectInfoDto> projectFilter(@RequestParam(value = "search", required = false) String search) {
+//        List params = new ArrayList();
+//        if (search != null) {
+//            Pattern pattern = Pattern.compile("(\w+?)(:|<|>)(\w+?),");
+//            Matcher matcher = pattern.matcher(search + ",");
+//            while (matcher.find()) {
+//                params.add(new SearchCriteria(matcher.group(1),
+//                        matcher.group(2), matcher.group(3)));
+//            }
+//        }
+//        return api.searchUser(params);
+//    }
+
 
     @PostMapping()
     public ProjectInfoDto createProject(@RequestBody ProjectInfoDto projectInfoDto,
@@ -54,8 +84,9 @@ public class ProjectController {
     }
 
     @GetMapping("{id}/tasks")
-    public List<TaskInfoDto> showTasks(@PathVariable Long id) {
-        return taskService.findProjectTasksDto(id);
+    public List<TaskInfoDto> showTasks(@PathVariable Long id,
+                                       Pageable pageable) {
+        return taskService.findProjectTasksDto(id,pageable);
     }
 
     @PostMapping("{id}/tasks")

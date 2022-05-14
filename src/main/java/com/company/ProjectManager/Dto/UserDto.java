@@ -1,6 +1,7 @@
 package com.company.ProjectManager.Dto;
 
 import com.company.ProjectManager.model.Role;
+import com.company.ProjectManager.model.User;
 import lombok.Data;
 
 import java.util.Set;
@@ -20,4 +21,7 @@ public class UserDto {
     public UserDto(){
     }
 
+    public static UserDto toUserInfoDto(User user) {
+        return new UserDto(user.getUsername(), user.getRoles());
+    }
 }

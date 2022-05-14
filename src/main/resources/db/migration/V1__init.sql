@@ -12,7 +12,7 @@ Hibernate: alter table if exists project_info_author drop constraint if exists F
     Hibernate: drop table if exists usr_project cascade
     Hibernate: drop sequence if exists hibernate_sequence
     Hibernate: create sequence hibernate_sequence start 1 increment 1
-Hibernate: create table project_info (id int8 not null, is_deleted boolean, name varchar(255), primary key (id))
+Hibernate: create table project_info (id int8 not null, company_name varchar(255), is_deleted boolean, is_ready boolean, name varchar(255), primary key (id))
     Hibernate: create table project_info_author (project_info_id int8 not null, author_id int8 not null)
     Hibernate: create table task_info (id int8 not null, is_deleted boolean, task varchar(255), project_id int8, primary key (id))
     Hibernate: create table user_role (user_id int8 not null, roles varchar(255))
