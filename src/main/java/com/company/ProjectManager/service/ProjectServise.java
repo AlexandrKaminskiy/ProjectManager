@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectServise {
@@ -37,8 +38,9 @@ public class ProjectServise {
         List<UserDto> authors = projectInfoDto.getAuthor();
         if (authors == null) authors = new ArrayList<>();
         authors.add(new UserDto(user.getUsername(),user.getRoles()));
-        authors = authors.stream()
-                .distinct()
+        authors = projectInfoDto.getAuthor().stream()
+                .collect(Collectors.toMap(UserDto::getUsername, p -> p, (p, q) -> p))
+                .values().stream()
                 .toList();
         for (var author : authors) {
             users.add(userRepo.findByUsername(author.getUsername()));
@@ -90,8 +92,9 @@ public class ProjectServise {
             projectInfo.setIsReady(projectInfoDto.getIsReady());
             ArrayList<User> users = new ArrayList<>();
             var authors = projectInfoDto.getAuthor().stream()
-                    .distinct()
-                    .toList();
+                    .collect(Collectors.toMap(UserDto::getUsername, p -> p, (p, q) -> p))
+                    .values();
+
             for (var author : authors) {
                 users.add(userRepo.findByUsername(author.getUsername()));
             }
